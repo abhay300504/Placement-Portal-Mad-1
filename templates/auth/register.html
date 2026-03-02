@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% block title %}Register — {{ role|capitalize }}{% endblock %}
+
+{% block body %}
+<div class="auth-page" style="padding:2rem 1rem;">
+  <div class="auth-card" style="max-width:520px;">
+
+    <div class="auth-logo">Placement<span>Portal</span></div>
+
+    {% if role == 'company' %}
+      <p class="auth-subtitle">
+        <i class="bi bi-building-fill" style="color:var(--primary);"></i>
+        Register Your Company
+      </p>
+    {% else %}
+      <p class="auth-subtitle">
+        <i class="bi bi-mortarboard-fill" style="color:var(--primary);"></i>
+        Create Your Student Account
+      </p>
+    {% endif %}
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <!-- Company gets an approval notice -->
+    {% if role == 'company' %}
+    <div class="alert alert-info" style="font-size:.82rem;">
+      <i class="bi bi-info-circle me-1"></i>
+      After registration, an admin must approve your account before you can log in.
+    </div>
+    {% endif %}
+
+    <!-- Single form — role is hidden field, fields change by role -->
+    <form method="POST" action="{{ url_for('auth_register', role=role) }}">
+      <input type="hidden" name="role" value="{{ role }}">
+
+      <div class="row g-3">
+
+        <!-- COMMON FIELDS (both roles) -->
+        <div class="col-12">
+          <label class="form-label">
+            {% if role == 'company' %}Company Name{% else %}Full Name{% endif %}
+            <span class="text-danger">*</span>
+          </label>
+          <input type="text"
+                 name="{{ 'company_name' if role == 'company' else 'full_name' }}"
+                 class="form-control"
+                 placeholder="{{ 'e.g. Acme Technologies' if role == 'company' else 'Enter your full name' }}"
+                 required>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Email Address <span class="text-danger">*</span></label>
+          <input type="email" name="email" class="form-control"
+                 placeholder="{{ 'hr@company.com' if role == 'company' else 'username@college.ac.in' }}"
+                 required>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Phone Number</label>
+          <input type="tel" name="phone" class="form-control" placeholder="9876543210">
+        </div>
+
+        <!-- COMPANY-ONLY FIELDS -->
+        {% if role == 'company' %}
+        <div class="col-md-6">
+          <label class="form-label">HR Contact Name</label>
+          <input type="text" name="hr_contact" class="form-control" placeholder="HR Manager Name">
+        </div>
+        <div class="col-12">
+          <label class="form-label">Website</label>
+          <input type="url" name="website" class="form-control" placeholder="https://yourcompany.com">
+        </div>
+        <div class="col-12">
+          <label class="form-label">Company Description</label>
+          <textarea name="description" class="form-control" rows="3"
+                    placeholder="Brief about your company…"></textarea>
+        </div>
+
+        <!-- STUDENT-ONLY FIELDS -->
+        {% else %}
+        <div class="col-md-6">
+          <label class="form-label">Branch / Department</label>
+          <input type="text" name="branch" class="form-control" placeholder="e.g. Computer Science">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Current Year</label>
+          <select name="year" class="form-select">
+            <option value="">Select year</option>
+            <option>1st Year</option>
+            <option>2nd Year</option>
+            <option>3rd Year</option>
+            <option>4th Year</option>
+          </select>
+        </div>
+        {% endif %}
+
+        <!-- PASSWORD (both roles) -->
+        <div class="col-md-6">
+          <label class="form-label">Password <span class="text-danger">*</span></label>
+          <input type="password" name="password" class="form-control"
+                 placeholder="Min. 6 characters" required minlength="6">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
+          <input type="password" name="confirm_password" class="form-control"
+                 placeholder="Repeat password" required>
+        </div>
+
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100 btn-lg mt-4">
+        {% if role == 'company' %}
+          <i class="bi bi-building-add me-2"></i>Submit Registration
+        {% else %}
+          <i class="bi bi-person-plus me-2"></i>Create Account
+        {% endif %}
+      </button>
+    </form>
+
+    <div class="auth-divider">or</div>
+
+    <div class="text-center" style="font-size:.85rem;">
+      Already have an account?
+      <a href="{{ url_for('auth_login', role=role) }}" class="fw-bold">Login here</a>
+    </div>
+    <div class="text-center mt-2">
+      <a href="{{ url_for('home') }}" class="text-muted" style="font-size:.82rem;">
+        <i class="bi bi-arrow-left"></i> Back to Home
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

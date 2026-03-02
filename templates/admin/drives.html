@@ -1,0 +1,96 @@
+{% extends 'layout_dashboard.html' %}
+{% block title %}Placement Drives{% endblock %}
+
+{% block sidebar %}
+  <div class="sidebar-section">Overview</div>
+  <a href="{{ url_for('admin_dashboard') }}" class="sidebar-link"><i class="bi bi-grid-fill"></i> Dashboard</a>
+  <div class="sidebar-section">Manage</div>
+  <a href="{{ url_for('admin_companies') }}" class="sidebar-link"><i class="bi bi-building"></i> Companies</a>
+  <a href="{{ url_for('admin_students') }}" class="sidebar-link"><i class="bi bi-people"></i> Students</a>
+  <a href="{{ url_for('admin_drives') }}" class="sidebar-link active"><i class="bi bi-briefcase"></i> Drives</a>
+  <a href="{{ url_for('admin_applications') }}" class="sidebar-link"><i class="bi bi-file-earmark-text"></i> Applications</a>
+  <div class="sidebar-section">Tools</div>
+  <a href="{{ url_for('admin_search') }}" class="sidebar-link"><i class="bi bi-search"></i> Search</a>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Placement Drives</h1>
+  <p>Approve or reject drives submitted by companies.</p>
+</div>
+
+<!-- Filter tabs -->
+<div class="mb-3 d-flex gap-2 flex-wrap">
+  <a href="{{ url_for('admin_drives') }}"
+     class="btn btn-sm {{ 'btn-primary' if not status_filter else 'btn-outline-secondary' }}">All</a>
+  {% for s in ['pending','approved','rejected','closed'] %}
+  <a href="{{ url_for('admin_drives') }}?status={{ s }}"
+     class="btn btn-sm {{ 'btn-primary' if status_filter==s else 'btn-outline-secondary' }}">
+    {{ s|capitalize }}
+  </a>
+  {% endfor %}
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    {% if drives %}
+    <table class="table mb-0">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Job Title</th>
+          <th>Company</th>
+          <th>Deadline</th>
+          <th>Applicants</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in drives %}
+        <tr>
+          <td class="text-muted">{{ d.id }}</td>
+          <td>
+            <div class="fw-600">{{ d.job_title }}</div>
+            {% if d.location %}
+            <div class="text-muted" style="font-size:.75rem;">
+              <i class="bi bi-geo-alt"></i> {{ d.location }}
+            </div>
+            {% endif %}
+          </td>
+          <td>{{ d.company.company_name }}</td>
+          <td style="font-size:.82rem;white-space:nowrap;">{{ d.application_deadline.strftime('%d %b %Y') }}</td>
+          <td>
+            <span class="badge badge-applied">{{ d.applications|length }}</span>
+          </td>
+          <td><span class="badge badge-{{ d.status }}">{{ d.status }}</span></td>
+          <td>
+            <div class="d-flex gap-1 flex-wrap">
+              <a href="{{ url_for('admin_drive_detail', drive_id=d.id) }}"
+                 class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-eye"></i> View
+              </a>
+              {% if d.status == 'pending' %}
+                <a href="{{ url_for('admin_approve_drive', drive_id=d.id) }}"
+                   class="btn btn-success btn-sm">Approve</a>
+                <a href="{{ url_for('admin_reject_drive', drive_id=d.id) }}"
+                   class="btn btn-danger btn-sm">Reject</a>
+              {% elif d.status == 'approved' %}
+                <a href="{{ url_for('admin_reject_drive', drive_id=d.id) }}"
+                   class="btn btn-warning btn-sm">Close</a>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <div class="empty-state">
+        <i class="bi bi-briefcase"></i>
+        <p>No drives found{{ ' with status "' + status_filter + '"' if status_filter else '' }}.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

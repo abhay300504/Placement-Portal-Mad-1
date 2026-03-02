@@ -1,0 +1,127 @@
+{% extends 'layout_dashboard.html' %}
+{% block title %}{{ company.company_name }}{% endblock %}
+
+{% block sidebar %}
+  <div class="sidebar-section">Overview</div>
+  <a href="{{ url_for('admin_dashboard') }}" class="sidebar-link"><i class="bi bi-grid-fill"></i> Dashboard</a>
+  <div class="sidebar-section">Manage</div>
+  <a href="{{ url_for('admin_companies') }}" class="sidebar-link active"><i class="bi bi-building"></i> Companies</a>
+  <a href="{{ url_for('admin_students') }}" class="sidebar-link"><i class="bi bi-people"></i> Students</a>
+  <a href="{{ url_for('admin_drives') }}" class="sidebar-link"><i class="bi bi-briefcase"></i> Drives</a>
+  <a href="{{ url_for('admin_applications') }}" class="sidebar-link"><i class="bi bi-file-earmark-text"></i> Applications</a>
+  <div class="sidebar-section">Tools</div>
+  <a href="{{ url_for('admin_search') }}" class="sidebar-link"><i class="bi bi-search"></i> Search</a>
+{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+  <a href="{{ url_for('admin_companies') }}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-left me-1"></i>Back to Companies
+  </a>
+</div>
+
+<div class="row g-3">
+  <!-- Profile card -->
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-body text-center" style="padding:2rem !important;">
+        <div style="width:72px;height:72px;border-radius:16px;background:var(--primary-lt);
+                    display:flex;align-items:center;justify-content:center;
+                    font-size:2rem;font-weight:700;color:var(--primary);margin:0 auto 1rem;">
+          {{ company.company_name[0]|upper }}
+        </div>
+        <h5 class="fw-700 mb-1">{{ company.company_name }}</h5>
+        <span class="badge badge-{{ company.approval_status }}">{{ company.approval_status }}</span>
+
+        <hr>
+        <div class="text-start" style="font-size:.85rem;">
+          <div class="mb-2"><i class="bi bi-envelope text-muted me-2"></i>{{ company.email }}</div>
+          {% if company.hr_contact %}
+          <div class="mb-2"><i class="bi bi-person text-muted me-2"></i>{{ company.hr_contact }}</div>
+          {% endif %}
+          {% if company.phone %}
+          <div class="mb-2"><i class="bi bi-telephone text-muted me-2"></i>{{ company.phone }}</div>
+          {% endif %}
+          {% if company.website %}
+          <div class="mb-2">
+            <i class="bi bi-globe text-muted me-2"></i>
+            <a href="{{ company.website }}" target="_blank">{{ company.website }}</a>
+          </div>
+          {% endif %}
+          <div class="mb-2">
+            <i class="bi bi-calendar text-muted me-2"></i>
+            Registered {{ company.registered_at.strftime('%d %b %Y') }}
+          </div>
+        </div>
+
+        {% if company.description %}
+        <hr>
+        <p style="font-size:.82rem;color:var(--muted);text-align:left;">{{ company.description }}</p>
+        {% endif %}
+
+        <hr>
+        <div class="d-flex flex-column gap-2">
+          {% if company.approval_status == 'pending' %}
+            <a href="{{ url_for('admin_approve_company', company_id=company.id) }}"
+               class="btn btn-success">Approve Company</a>
+            <a href="{{ url_for('admin_reject_company', company_id=company.id) }}"
+               class="btn btn-danger">Reject Company</a>
+          {% elif company.approval_status == 'approved' %}
+            <a href="{{ url_for('admin_blacklist_company', company_id=company.id) }}"
+               class="btn btn-warning">Blacklist Company</a>
+          {% else %}
+            <a href="{{ url_for('admin_approve_company', company_id=company.id) }}"
+               class="btn btn-success">Re-approve</a>
+          {% endif %}
+          <a href="{{ url_for('admin_delete_company', company_id=company.id) }}"
+             class="btn btn-outline-danger"
+             onclick="return confirm('Delete this company permanently?')">
+            <i class="bi bi-trash me-1"></i>Delete Company
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Drives table -->
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header">
+        <span><i class="bi bi-briefcase me-2 text-muted"></i>Placement Drives ({{ drives|length }})</span>
+      </div>
+      <div class="card-body p-0">
+        {% if drives %}
+        <table class="table mb-0">
+          <thead>
+            <tr><th>#</th><th>Job Title</th><th>Deadline</th><th>Status</th><th>Action</th></tr>
+          </thead>
+          <tbody>
+            {% for d in drives %}
+            <tr>
+              <td class="text-muted">{{ d.id }}</td>
+              <td class="fw-600">{{ d.job_title }}</td>
+              <td style="font-size:.82rem;">{{ d.application_deadline.strftime('%d %b %Y') }}</td>
+              <td><span class="badge badge-{{ d.status }}">{{ d.status }}</span></td>
+              <td>
+                <a href="{{ url_for('admin_drive_detail', drive_id=d.id) }}"
+                   class="btn btn-outline-secondary btn-sm">View</a>
+                {% if d.status == 'pending' %}
+                  <a href="{{ url_for('admin_approve_drive', drive_id=d.id) }}"
+                     class="btn btn-success btn-sm ms-1">Approve</a>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+          <div class="empty-state">
+            <i class="bi bi-briefcase"></i>
+            <p>No drives created by this company.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

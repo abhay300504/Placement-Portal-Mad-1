@@ -1,0 +1,122 @@
+{% extends 'layout_dashboard.html' %}
+{% block title %}Manage Companies{% endblock %}
+
+{% block sidebar %}
+  <div class="sidebar-section">Overview</div>
+  <a href="{{ url_for('admin_dashboard') }}" class="sidebar-link">
+    <i class="bi bi-grid-fill"></i> Dashboard
+  </a>
+  <div class="sidebar-section">Manage</div>
+  <a href="{{ url_for('admin_companies') }}" class="sidebar-link active">
+    <i class="bi bi-building"></i> Companies
+  </a>
+  <a href="{{ url_for('admin_students') }}" class="sidebar-link">
+    <i class="bi bi-people"></i> Students
+  </a>
+  <a href="{{ url_for('admin_drives') }}" class="sidebar-link">
+    <i class="bi bi-briefcase"></i> Drives
+  </a>
+  <a href="{{ url_for('admin_applications') }}" class="sidebar-link">
+    <i class="bi bi-file-earmark-text"></i> Applications
+  </a>
+  <div class="sidebar-section">Tools</div>
+  <a href="{{ url_for('admin_search') }}" class="sidebar-link">
+    <i class="bi bi-search"></i> Search
+  </a>
+{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex align-items-start justify-content-between flex-wrap gap-2">
+  <div>
+    <h1>Registered Companies</h1>
+    <p>Approve, reject, or manage company accounts.</p>
+  </div>
+  <!-- Search -->
+  <form method="GET" action="{{ url_for('admin_companies') }}" class="search-bar">
+    <input type="text" name="search" class="form-control"
+           placeholder="Search by name…" value="{{ search }}">
+    <button type="submit" class="btn btn-primary">
+      <i class="bi bi-search"></i>
+    </button>
+  </form>
+</div>
+
+<!-- Filter tabs -->
+<div class="mb-3 d-flex gap-2 flex-wrap">
+  <a href="{{ url_for('admin_companies') }}"
+     class="btn btn-sm {{ 'btn-primary' if not request.args.get('status') else 'btn-outline-secondary' }}">All</a>
+  {% for s in ['pending','approved','rejected','blacklisted'] %}
+  <a href="{{ url_for('admin_companies') }}?status={{ s }}"
+     class="btn btn-sm {{ 'btn-primary' if request.args.get('status')==s else 'btn-outline-secondary' }}">
+    {{ s|capitalize }}
+  </a>
+  {% endfor %}
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    {% if companies %}
+    <table class="table mb-0">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Company</th>
+          <th>HR Contact</th>
+          <th>Registered</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in companies %}
+        <tr>
+          <td class="text-muted">{{ c.id }}</td>
+          <td>
+            <div class="fw-600">{{ c.company_name }}</div>
+            <div class="text-muted" style="font-size:.75rem;">{{ c.email }}</div>
+          </td>
+          <td>{{ c.hr_contact or '—' }}</td>
+          <td style="white-space:nowrap;font-size:.8rem;">
+            {{ c.registered_at.strftime('%d %b %Y') }}
+          </td>
+          <td>
+            <span class="badge badge-{{ c.approval_status }}">{{ c.approval_status }}</span>
+          </td>
+          <td>
+            <div class="d-flex gap-0 flex-wrap">
+              <a href="{{ url_for('admin_company_detail', company_id=c.id) }}"
+                 class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-eye"></i>
+              </a>
+              {% if c.approval_status == 'pending' %}
+                <a href="{{ url_for('admin_approve_company', company_id=c.id) }}"
+                   class="btn btn-success btn-sm">Approve</a>
+                <a href="{{ url_for('admin_reject_company', company_id=c.id) }}"
+                   class="btn btn-danger btn-sm">Reject</a>
+              {% elif c.approval_status == 'approved' %}
+                <a href="{{ url_for('admin_blacklist_company', company_id=c.id) }}"
+                   class="btn btn-warning btn-sm">Blacklist</a>
+              {% elif c.approval_status in ['rejected','blacklisted'] %}
+                <a href="{{ url_for('admin_approve_company', company_id=c.id) }}"
+                   class="btn btn-success btn-sm">Approve</a>
+              {% endif %}
+              <a href="{{ url_for('admin_delete_company', company_id=c.id) }}"
+                 class="btn btn-outline-danger btn-sm"
+                 onclick="return confirm('Delete this company and all its data?')">
+                <i class="bi bi-trash"></i>
+              </a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <div class="empty-state">
+        <i class="bi bi-building"></i>
+        <p>No companies found{% if search %} for "{{ search }}"{% endif %}.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

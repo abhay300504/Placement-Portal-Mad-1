@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% block title %}Placement Portal — Home{% endblock %}
+
+{% block body %}
+
+<!-- Flash messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-container">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show shadow">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<div class="hero">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- Top navbar -->
+  <nav class="top-nav">
+    <div class="logo">Placement<span>Portal</span></div>
+    <div class="nav-links">
+      <a href="{{ url_for('auth_login', role='student') }}" class="nav-btn nav-btn-ghost">Student Login</a>
+      <a href="{{ url_for('auth_login', role='company') }}" class="nav-btn nav-btn-ghost">Company Login</a>
+      <a href="{{ url_for('auth_login', role='admin') }}"   class="nav-btn nav-btn-solid">Admin</a>
+    </div>
+  </nav>
+
+  <!-- Hero text -->
+  <div class="hero-content">
+    <div class="badge-pill">
+      <i class="bi bi-stars"></i>
+        Campus Recruitment Platform
+    </div>
+    <h1 class="hero-title">
+      Your Career Starts<br>
+      <span class="gradient-text">Right Here</span>
+    </h1>
+    <p class="hero-sub">
+      A unified portal for students to find jobs, companies to hire talent,
+      and placement cells to manage it all — seamlessly.
+    </p>
+  </div>
+
+  <!-- Role cards -->
+  <div class="cards-row">
+
+    <!-- Admin -->
+    <div style="display:flex;flex-direction:column;align-items:center;">
+      <a href="{{ url_for('auth_login', role='admin') }}" class="role-card">
+        <div class="role-icon icon-admin">
+          <i class="bi bi-shield-lock-fill"></i>
+        </div>
+        <h3>Admin</h3>
+        <p>Placement Cell Portal</p>
+      </a>
+    </div>
+
+    <!-- Company -->
+    <div style="display:flex;flex-direction:column;align-items:center;">
+      <a href="{{ url_for('auth_login', role='company') }}" class="role-card">
+        <div class="role-icon icon-company">
+          <i class="bi bi-building-fill"></i>
+        </div>
+        <h3>Company</h3>
+        <p>Post drives &amp; hire talent</p>
+      </a>
+      <a href="{{ url_for('auth_register', role='company') }}" class="register-link">
+        New company? Register →
+      </a>
+    </div>
+
+    <!-- Student -->
+    <div style="display:flex;flex-direction:column;align-items:center;">
+      <a href="{{ url_for('auth_login', role='student') }}" class="role-card">
+        <div class="role-icon icon-student">
+          <i class="bi bi-mortarboard-fill"></i>
+        </div>
+        <h3>Student</h3>
+        <p>Find &amp; apply for drives</p>
+      </a>
+      <a href="{{ url_for('auth_register', role='student') }}" class="register-link">
+        New student? Register →
+      </a>
+    </div>
+
+  </div>
+
+  <!-- Stats bar -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-num">500+</div>
+      <div class="stat-lbl">Students Placed</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <div class="stat-num">120+</div>
+      <div class="stat-lbl">Companies</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <div class="stat-num">300+</div>
+      <div class="stat-lbl">Drives Completed</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <div class="stat-num">95%</div>
+      <div class="stat-lbl">Success Rate</div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

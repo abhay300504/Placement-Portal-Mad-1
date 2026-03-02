@@ -1,0 +1,209 @@
+{% extends 'layout_dashboard.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block sidebar %}
+  <div class="sidebar-section">Overview</div>
+  <a href="{{ url_for('admin_dashboard') }}" class="sidebar-link active">
+    <i class="bi bi-grid-fill"></i> Dashboard
+  </a>
+
+  <div class="sidebar-section">Manage</div>
+  <a href="{{ url_for('admin_companies') }}" class="sidebar-link">
+    <i class="bi bi-building"></i> Companies
+    {% if stats.pending_companies > 0 %}
+      <span class="badge badge-pending ms-auto">{{ stats.pending_companies }}</span>
+    {% endif %}
+  </a>
+  <a href="{{ url_for('admin_students') }}" class="sidebar-link">
+    <i class="bi bi-people"></i> Students
+  </a>
+  <a href="{{ url_for('admin_drives') }}" class="sidebar-link">
+    <i class="bi bi-briefcase"></i> Drives
+    {% if stats.pending_drives > 0 %}
+      <span class="badge badge-pending ms-auto">{{ stats.pending_drives }}</span>
+    {% endif %}
+  </a>
+  <a href="{{ url_for('admin_applications') }}" class="sidebar-link">
+    <i class="bi bi-file-earmark-text"></i> Applications
+  </a>
+
+  <div class="sidebar-section">Tools</div>
+  <a href="{{ url_for('admin_search') }}" class="sidebar-link">
+    <i class="bi bi-search"></i> Search
+  </a>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Welcome, Admin 👋</h1>
+  <p>Here's what's happening on your placement portal today.</p>
+</div>
+
+<!-- ── Stat Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="stat-icon indigo"><i class="bi bi-people-fill"></i></div>
+      <div>
+        <div class="stat-value">{{ stats.total_students }}</div>
+        <div class="stat-label">Total Students</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="stat-icon green"><i class="bi bi-building-fill"></i></div>
+      <div>
+        <div class="stat-value">{{ stats.total_companies }}</div>
+        <div class="stat-label">Total Companies</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="stat-icon amber"><i class="bi bi-briefcase-fill"></i></div>
+      <div>
+        <div class="stat-value">{{ stats.total_drives }}</div>
+        <div class="stat-label">Placement Drives</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="stat-icon cyan"><i class="bi bi-file-earmark-fill"></i></div>
+      <div>
+        <div class="stat-value">{{ stats.total_applications }}</div>
+        <div class="stat-label">Total Applications</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Pending alerts -->
+{% if stats.pending_companies > 0 or stats.pending_drives > 0 %}
+<div class="row g-3 mb-4">
+  {% if stats.pending_companies > 0 %}
+  <div class="col-md-10">
+    <div class="alert alert-warning d-flex align-items-center justify-content-between mb-0">
+      <span>
+        <i class="bi bi-clock me-2"></i>
+        <strong>{{ stats.pending_companies }}</strong> company registration(s) awaiting approval
+      </span>
+      <a href="{{ url_for('admin_companies') }}?status=pending" class="btn btn-warning btn-sm">Review</a>
+    </div>
+  </div>
+  {% endif %}
+  {% if stats.pending_drives > 0 %}
+  <div class="col-md-6">
+    <div class="alert alert-warning d-flex align-items-center justify-content-between mb-0">
+      <span>
+        <i class="bi bi-clock me-2"></i>
+        <strong>{{ stats.pending_drives }}</strong> placement drive(s) awaiting approval
+      </span>
+      <a href="{{ url_for('admin_drives') }}?status=pending" class="btn btn-warning btn-sm">Review</a>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+
+<div class="row g-3">
+  <!-- Recent Companies -->
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <span><i class="bi bi-building me-2 text-muted"></i>Recent Companies</span>
+        <a href="{{ url_for('admin_companies') }}" class="btn btn-outline-secondary btn-sm">View all</a>
+      </div>
+      <div class="card-body p-0">
+        {% if recent_companies %}
+        <table class="table mb-0">
+          <thead>
+            <tr>
+              <th>Company</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in recent_companies %}
+            <tr>
+              <td>
+                <div class="fw-600">{{ c.company_name }}</div>
+                <div class="text-muted" style="font-size:.75rem;">{{ c.email }}</div>
+              </td>
+              <td>
+                <span class="badge badge-{{ c.approval_status }}">{{ c.approval_status }}</span>
+              </td>
+              <td>
+                {% if c.approval_status == 'pending' %}
+                  <a href="{{ url_for('admin_approve_company', company_id=c.id) }}"
+                     class="btn btn-success btn-sm">Approve</a>
+                  <a href="{{ url_for('admin_reject_company', company_id=c.id) }}"
+                     class="btn btn-danger btn-sm ms-1">Reject</a>
+                {% else %}
+                  <a href="{{ url_for('admin_company_detail', company_id=c.id) }}"
+                     class="btn btn-outline-secondary btn-sm">View</a>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+          <div class="empty-state"><i class="bi bi-building"></i><p>No companies registered yet.</p></div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Drives -->
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <span><i class="bi bi-briefcase me-2 text-muted"></i>Recent Drives</span>
+        <a href="{{ url_for('admin_drives') }}" class="btn btn-outline-secondary btn-sm">View all</a>
+      </div>
+      <div class="card-body p-0">
+        {% if recent_drives %}
+        <table class="table mb-0">
+          <thead>
+            <tr>
+              <th>Drive</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for d in recent_drives %}
+            <tr>
+              <td>
+                <div class="fw-600">{{ d.job_title }}</div>
+                <div class="text-muted" style="font-size:.75rem;">{{ d.company.company_name }}</div>
+              </td>
+              <td>
+                <span class="badge badge-{{ d.status }}">{{ d.status }}</span>
+              </td>
+              <td>
+                {% if d.status == 'pending' %}
+                  <a href="{{ url_for('admin_approve_drive', drive_id=d.id) }}"
+                     class="btn btn-success btn-sm">Approve</a>
+                  <a href="{{ url_for('admin_reject_drive', drive_id=d.id) }}"
+                     class="btn btn-danger btn-sm ms-1">Reject</a>
+                {% else %}
+                  <a href="{{ url_for('admin_drive_detail', drive_id=d.id) }}"
+                     class="btn btn-outline-secondary btn-sm">View</a>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+          <div class="empty-state"><i class="bi bi-briefcase"></i><p>No drives created yet.</p></div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

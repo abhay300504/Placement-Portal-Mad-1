@@ -1,0 +1,71 @@
+{% extends 'layout_dashboard.html' %}
+{% block title %}Browse Drives{% endblock %}
+
+{% block sidebar %}
+  <div class="sidebar-section">Overview</div>
+  <a href="{{ url_for('student_dashboard') }}" class="sidebar-link"><i class="bi bi-grid-fill"></i> Dashboard</a>
+  <div class="sidebar-section">Placement</div>
+  <a href="{{ url_for('student_drives') }}" class="sidebar-link active"><i class="bi bi-briefcase"></i> Browse Drives</a>
+  <a href="{{ url_for('student_applications') }}" class="sidebar-link"><i class="bi bi-file-earmark-text"></i> My Applications</a>
+  <div class="sidebar-section">Account</div>
+  <a href="{{ url_for('student_edit_profile') }}" class="sidebar-link"><i class="bi bi-person"></i> Edit Profile</a>
+{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex align-items-start justify-content-between flex-wrap gap-2">
+  <div>
+    <h1>Browse Placement Drives</h1>
+    <p>All currently open drives available for application.</p>
+  </div>
+  <form method="GET" action="{{ url_for('student_drives') }}" class="search-bar">
+    <input type="text" name="search" class="form-control"
+           placeholder="Search job title or company…" value="{{ search }}">
+    <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i></button>
+  </form>
+</div>
+
+{% if drives %}
+<div class="row g-3">
+  {% for d in drives %}
+  <div class="col-md-6 col-xl-4">
+    <div class="drive-card">
+      <div class="d-flex align-items-start gap-3 mb-3">
+        <div class="company-logo">{{ d.company.company_name[0]|upper }}</div>
+        <div class="flex-grow-1 min-w-0">
+          <div class="fw-700" style="font-size:.95rem;">{{ d.job_title }}</div>
+          <div class="text-muted" style="font-size:.8rem;">{{ d.company.company_name }}</div>
+        </div>
+        {% if d.id in applied_drive_ids %}
+          <span class="badge badge-applied">Applied</span>
+        {% endif %}
+      </div>
+
+      <div class="drive-meta mb-3">
+        {% if d.location %}
+        <div><i class="bi bi-geo-alt"></i> {{ d.location }}</div>
+        {% endif %}
+        {% if d.salary_package %}
+        <div><i class="bi bi-currency-rupee"></i> {{ d.salary_package }}</div>
+        {% endif %}
+        <div><i class="bi bi-calendar3"></i> Deadline: {{ d.application_deadline.strftime('%d %b %Y') }}</div>
+      </div>
+
+      {% if d.eligibility_criteria %}
+      <div style="font-size:.78rem;color:var(--muted);margin-bottom:.75rem;">
+        <strong>Eligibility:</strong> {{ d.eligibility_criteria[:80] }}{{ '…' if d.eligibility_criteria|length > 80 }}
+      </div>
+      {% endif %}
+
+      <a href="{{ url_for('student_drive_detail', drive_id=d.id) }}"
+         class="btn btn-outline-primary btn-sm w-100">View Details</a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+  <div class="empty-state card" style="padding:4rem;">
+    <i class="bi bi-briefcase"></i>
+    <p>No open drives found{% if search %} for "{{ search }}"{% endif %}.</p>
+  </div>
+{% endif %}
+{% endblock %}

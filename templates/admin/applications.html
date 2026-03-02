@@ -1,0 +1,64 @@
+{% extends 'layout_dashboard.html' %}
+{% block title %}All Applications{% endblock %}
+
+{% block sidebar %}
+  <div class="sidebar-section">Overview</div>
+  <a href="{{ url_for('admin_dashboard') }}" class="sidebar-link"><i class="bi bi-grid-fill"></i> Dashboard</a>
+  <div class="sidebar-section">Manage</div>
+  <a href="{{ url_for('admin_companies') }}" class="sidebar-link"><i class="bi bi-building"></i> Companies</a>
+  <a href="{{ url_for('admin_students') }}" class="sidebar-link"><i class="bi bi-people"></i> Students</a>
+  <a href="{{ url_for('admin_drives') }}" class="sidebar-link"><i class="bi bi-briefcase"></i> Drives</a>
+  <a href="{{ url_for('admin_applications') }}" class="sidebar-link active"><i class="bi bi-file-earmark-text"></i> Applications</a>
+  <div class="sidebar-section">Tools</div>
+  <a href="{{ url_for('admin_search') }}" class="sidebar-link"><i class="bi bi-search"></i> Search</a>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>All Applications</h1>
+  <p>Complete historical placement data across all drives.</p>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    {% if applications %}
+    <table class="table mb-0">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Student</th>
+          <th>Drive</th>
+          <th>Company</th>
+          <th>Applied On</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for app in applications %}
+        <tr>
+          <td class="text-muted">{{ app.id }}</td>
+          <td>
+            <a href="{{ url_for('admin_student_detail', student_id=app.student_id) }}"
+               class="fw-600 text-decoration-none">{{ app.student.full_name }}</a>
+            <div class="text-muted" style="font-size:.75rem;">{{ app.student.branch or '' }}</div>
+          </td>
+          <td>
+            <a href="{{ url_for('admin_drive_detail', drive_id=app.drive_id) }}"
+               class="text-decoration-none">{{ app.drive.job_title }}</a>
+          </td>
+          <td>{{ app.drive.company.company_name }}</td>
+          <td style="font-size:.8rem;white-space:nowrap;">{{ app.application_date.strftime('%d %b %Y') }}</td>
+          <td><span class="badge badge-{{ app.status }}">{{ app.status }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <div class="empty-state">
+        <i class="bi bi-file-earmark-text"></i>
+        <p>No applications yet.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

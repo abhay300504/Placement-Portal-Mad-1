@@ -1,0 +1,93 @@
+{% extends 'layout_dashboard.html' %}
+{% block title %}Edit Profile{% endblock %}
+
+{% block sidebar %}
+  <div class="sidebar-section">Overview</div>
+  <a href="{{ url_for('student_dashboard') }}" class="sidebar-link"><i class="bi bi-grid-fill"></i> Dashboard</a>
+  <div class="sidebar-section">Placement</div>
+  <a href="{{ url_for('student_drives') }}" class="sidebar-link"><i class="bi bi-briefcase"></i> Browse Drives</a>
+  <a href="{{ url_for('student_applications') }}" class="sidebar-link"><i class="bi bi-file-earmark-text"></i> My Applications</a>
+  <div class="sidebar-section">Account</div>
+  <a href="{{ url_for('student_edit_profile') }}" class="sidebar-link active"><i class="bi bi-person"></i> Edit Profile</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="page-header">
+      <h1>Edit Profile</h1>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <form method="POST" action="{{ url_for('student_edit_profile') }}"
+              enctype="multipart/form-data">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Full Name</label>
+              <input type="text" name="full_name" class="form-control"
+                     value="{{ student.full_name }}" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Phone Number</label>
+              <input type="tel" name="phone" class="form-control"
+                     value="{{ student.phone or '' }}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Branch / Department</label>
+              <input type="text" name="branch" class="form-control"
+                     value="{{ student.branch or '' }}"
+                     placeholder="e.g. Computer Science">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Current Year</label>
+              <select name="year" class="form-select">
+                <option value="">Select year</option>
+                {% for yr in ['1st Year','2nd Year','3rd Year','4th Year'] %}
+                <option value="{{ yr }}" {{ 'selected' if student.year == yr }}>{{ yr }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">CGPA</label>
+              <input type="number" step="0.01" min="0" max="10"
+                     name="cgpa" class="form-control"
+                     value="{{ student.cgpa or '' }}" placeholder="e.g. 8.5">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Skills</label>
+              <input type="text" name="skills" class="form-control"
+                     value="{{ student.skills or '' }}"
+                     placeholder="e.g. Python, Java, SQL, React">
+            </div>
+
+            <!-- Resume upload -->
+            <div class="col-12">
+              <label class="form-label">
+                Resume (PDF only, max 5 MB)
+              </label>
+              {% if student.resume_path %}
+              <div class="mb-2" style="font-size:.82rem;">
+                <i class="bi bi-file-pdf text-danger me-1"></i>
+                Current resume:
+                <a href="/{{ student.resume_path }}" target="_blank">View / Download</a>
+              </div>
+              {% endif %}
+              <input type="file" name="resume" class="form-control" accept=".pdf">
+            </div>
+          </div>
+
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-primary btn-lg">
+              <i class="bi bi-check-lg me-1"></i>Save Changes
+            </button>
+            <a href="{{ url_for('student_dashboard') }}"
+               class="btn btn-outline-secondary btn-lg">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

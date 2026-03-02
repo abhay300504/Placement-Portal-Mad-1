@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}Login — {{ role|capitalize }} Portal{% endblock %}
+
+{% block body %}
+<div class="auth-page">
+  <div class="auth-card">
+
+    <!-- Logo -->
+    <div class="auth-logo">Placement<span>Portal</span></div>
+
+    <!-- Role icon + subtitle changes based on ?role= in URL -->
+    {% if role == 'admin' %}
+      <p class="auth-subtitle">
+        <i class="bi bi-shield-lock-fill" style="color:var(--primary);"></i>
+        Admin / Placement Cell Login
+      </p>
+    {% elif role == 'company' %}
+      <p class="auth-subtitle">
+        <i class="bi bi-building-fill" style="color:var(--primary);"></i>
+        Company Login
+      </p>
+    {% else %}
+      <p class="auth-subtitle">
+        <i class="bi bi-mortarboard-fill" style="color:var(--primary);"></i>
+        Student Login
+      </p>
+    {% endif %}
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('auth_login', role=role) }}">
+      <input type="hidden" name="role" value="{{ role }}">
+
+      <div class="mb-3">
+        <label class="form-label">Email Address</label>
+        <input type="email" name="email" class="form-control"
+               placeholder="Enter your email" required autofocus>
+      </div>
+      <div class="mb-4">
+        <label class="form-label">Password</label>
+        <input type="password" name="password" class="form-control"
+               placeholder="••••••••" required>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100 btn-lg">
+        {% if role == 'admin' %}
+          <i class="bi bi-shield-lock me-2"></i>Login as Admin
+        {% elif role == 'company' %}
+          <i class="bi bi-building me-2"></i>Login as Company
+        {% else %}
+          <i class="bi bi-mortarboard me-2"></i>Login as Student
+        {% endif %}
+      </button>
+    </form>
+
+    <!-- Show Register link only for company and student -->
+    {% if role != 'admin' %}
+      <div class="auth-divider">or</div>
+      <div class="text-center" style="font-size:.85rem;">
+        Don't have an account?
+        <a href="{{ url_for('auth_register', role=role) }}" class="fw-bold">
+          Register here
+        </a>
+      </div>
+    {% endif %}
+
+    <div class="text-center mt-3">
+      <a href="{{ url_for('home') }}" class="text-muted" style="font-size:.82rem;">
+        <i class="bi bi-arrow-left"></i> Back to Home
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

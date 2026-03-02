@@ -1,0 +1,125 @@
+{% extends 'layout_dashboard.html' %}
+{% block title %}Drive — {{ drive.job_title }}{% endblock %}
+
+{% block sidebar %}
+  <div class="sidebar-section">Overview</div>
+  <a href="{{ url_for('admin_dashboard') }}" class="sidebar-link"><i class="bi bi-grid-fill"></i> Dashboard</a>
+  <div class="sidebar-section">Manage</div>
+  <a href="{{ url_for('admin_companies') }}" class="sidebar-link"><i class="bi bi-building"></i> Companies</a>
+  <a href="{{ url_for('admin_students') }}" class="sidebar-link"><i class="bi bi-people"></i> Students</a>
+  <a href="{{ url_for('admin_drives') }}" class="sidebar-link active"><i class="bi bi-briefcase"></i> Drives</a>
+  <a href="{{ url_for('admin_applications') }}" class="sidebar-link"><i class="bi bi-file-earmark-text"></i> Applications</a>
+  <div class="sidebar-section">Tools</div>
+  <a href="{{ url_for('admin_search') }}" class="sidebar-link"><i class="bi bi-search"></i> Search</a>
+{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+  <a href="{{ url_for('admin_drives') }}" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-left me-1"></i>Back to Drives
+  </a>
+</div>
+
+<div class="row g-3">
+  <!-- Drive Info -->
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-body" style="padding:1.5rem !important;">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div style="width:52px;height:52px;border-radius:12px;background:var(--primary-lt);
+                      display:flex;align-items:center;justify-content:center;
+                      font-size:1.4rem;color:var(--primary);">
+            <i class="bi bi-briefcase-fill"></i>
+          </div>
+          <div>
+            <h5 class="fw-700 mb-0">{{ drive.job_title }}</h5>
+            <div class="text-muted" style="font-size:.82rem;">{{ drive.company.company_name }}</div>
+          </div>
+        </div>
+
+        <span class="badge badge-{{ drive.status }} mb-3">{{ drive.status }}</span>
+
+        <div style="font-size:.85rem;" class="mb-3">
+          {% if drive.location %}
+          <div class="mb-2"><i class="bi bi-geo-alt text-muted me-2"></i>{{ drive.location }}</div>
+          {% endif %}
+          {% if drive.salary_package %}
+          <div class="mb-2"><i class="bi bi-currency-rupee text-muted me-2"></i>{{ drive.salary_package }}</div>
+          {% endif %}
+          <div class="mb-2">
+            <i class="bi bi-calendar text-muted me-2"></i>
+            Deadline: {{ drive.application_deadline.strftime('%d %b %Y') }}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <div class="fw-600 mb-1" style="font-size:.82rem;">Job Description</div>
+          <p style="font-size:.82rem;color:var(--muted);">{{ drive.job_description }}</p>
+        </div>
+
+        {% if drive.eligibility_criteria %}
+        <div class="mb-3">
+          <div class="fw-600 mb-1" style="font-size:.82rem;">Eligibility</div>
+          <p style="font-size:.82rem;color:var(--muted);">{{ drive.eligibility_criteria }}</p>
+        </div>
+        {% endif %}
+
+        <hr>
+        {% if drive.status == 'pending' %}
+          <a href="{{ url_for('admin_approve_drive', drive_id=drive.id) }}"
+             class="btn btn-success w-100 mb-2">Approve Drive</a>
+          <a href="{{ url_for('admin_reject_drive', drive_id=drive.id) }}"
+             class="btn btn-danger w-100">Reject Drive</a>
+        {% elif drive.status == 'approved' %}
+          <a href="{{ url_for('admin_reject_drive', drive_id=drive.id) }}"
+             class="btn btn-warning w-100">Mark as Closed</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Applications table -->
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header">
+        <span><i class="bi bi-people me-2 text-muted"></i>Applicants ({{ applications|length }})</span>
+      </div>
+      <div class="card-body p-0">
+        {% if applications %}
+        <table class="table mb-0">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Branch</th>
+              <th>Applied On</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for app in applications %}
+            <tr>
+              <td>
+                <a href="{{ url_for('admin_student_detail', student_id=app.student_id) }}"
+                   class="fw-600 text-decoration-none">
+                  {{ app.student.full_name }}
+                </a>
+                <div class="text-muted" style="font-size:.75rem;">{{ app.student.email }}</div>
+              </td>
+              <td>{{ app.student.branch or '—' }}</td>
+              <td style="font-size:.8rem;">{{ app.application_date.strftime('%d %b %Y') }}</td>
+              <td><span class="badge badge-{{ app.status }}">{{ app.status }}</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+          <div class="empty-state">
+            <i class="bi bi-people"></i>
+            <p>No applications received yet.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

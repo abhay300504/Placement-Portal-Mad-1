@@ -1,0 +1,65 @@
+{% extends 'layout_dashboard.html' %}
+{% block title %}My Applications{% endblock %}
+
+{% block sidebar %}
+  <div class="sidebar-section">Overview</div>
+  <a href="{{ url_for('student_dashboard') }}" class="sidebar-link"><i class="bi bi-grid-fill"></i> Dashboard</a>
+  <div class="sidebar-section">Placement</div>
+  <a href="{{ url_for('student_drives') }}" class="sidebar-link"><i class="bi bi-briefcase"></i> Browse Drives</a>
+  <a href="{{ url_for('student_applications') }}" class="sidebar-link active"><i class="bi bi-file-earmark-text"></i> My Applications</a>
+  <div class="sidebar-section">Account</div>
+  <a href="{{ url_for('student_edit_profile') }}" class="sidebar-link"><i class="bi bi-person"></i> Edit Profile</a>
+{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex align-items-start justify-content-between">
+  <div>
+    <h1>Student Application History</h1>
+    <p>{{ student.full_name }} - {{ student.branch or 'N/A' }}</p>
+  </div>
+  <a href="{{ url_for('student_drives') }}" class="btn btn-primary btn-sm">
+    <i class="bi bi-briefcase me-1"></i>Browse Drives
+  </a>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    {% if applications %}
+    <table class="table mb-0">
+      <thead>
+        <tr>
+          <th>Drive No.</th>
+          <th>Job Title</th>
+          <th>Company</th>
+          <th>Applied On</th>
+          <th>Status</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for app in applications %}
+        <tr>
+          <td class="text-muted">{{ loop.index }}</td>
+          <td class="fw-600">{{ app.drive.job_title }}</td>
+          <td>{{ app.drive.company.company_name }}</td>
+          <td style="font-size:.82rem;">{{ app.application_date.strftime('%d %b %Y') }}</td>
+          <td><span class="badge badge-{{ app.status }}">{{ app.status }}</span></td>
+          <td>
+            <a href="{{ url_for('student_drive_detail', drive_id=app.drive_id) }}"
+               class="btn btn-outline-secondary btn-sm">View Drive</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <div class="empty-state">
+        <i class="bi bi-file-earmark-text"></i>
+        <p>You haven't applied to any drives yet.
+          <a href="{{ url_for('student_drives') }}">Browse open drives.</a>
+        </p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
