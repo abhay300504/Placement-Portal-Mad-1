@@ -34,7 +34,6 @@ def register_routes(app):
     # HOME PAGE
     @app.route('/')
     def home():
-        """If already logged in, go straight to dashboard. Otherwise show home."""
         if 'user_id' in session:
             role = session.get('role')
             if role == 'admin':   return redirect(url_for('admin_dashboard'))

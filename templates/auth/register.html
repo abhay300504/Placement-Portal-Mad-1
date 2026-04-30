@@ -9,12 +9,10 @@
 
     {% if role == 'company' %}
       <p class="auth-subtitle">
-        <i class="bi bi-building-fill" style="color:var(--primary);"></i>
         Register Your Company
       </p>
     {% else %}
       <p class="auth-subtitle">
-        <i class="bi bi-mortarboard-fill" style="color:var(--primary);"></i>
         Create Your Student Account
       </p>
     {% endif %}
@@ -33,7 +31,7 @@
     </div>
     {% endif %}
 
-    <!-- Single form — role is hidden field, fields change by role -->
+    <!-- Single form — role is, fields change by role -->
     <form method="POST" action="{{ url_for('auth_register', role=role) }}">
       <input type="hidden" name="role" value="{{ role }}">
 
@@ -114,9 +112,9 @@
 
       <button type="submit" class="btn btn-primary w-100 btn-lg mt-4">
         {% if role == 'company' %}
-          <i class="bi bi-building-add me-2"></i>Submit Registration
+          Submit Registration
         {% else %}
-          <i class="bi bi-person-plus me-2"></i>Create Account
+          Create Account
         {% endif %}
       </button>
     </form>
