@@ -254,7 +254,6 @@ Werkzeug==3.0.3
 
 **Abhay Sahu**
 
-- Roll No: 23f1001119
 - IIT Madras — BS in Data Science and Applications
 - Email: abhaysahu7355@gmail.com
 
