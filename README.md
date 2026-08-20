@@ -3,7 +3,7 @@
 ![Home Page](screenshots/home.png)
 
 A full-stack **Campus Placement Management System** built with Python (Flask) that connects Students, Companies, and the Institute Placement Cell on a single platform.
-
+ 
 ### Admin Dashboard
 
 ![Admin Dashboard](screenshots/admin_dashboard.png)
